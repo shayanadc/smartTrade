@@ -19,4 +19,4 @@ class TestSell(TestCase):
 
         s = Sell.Sell(buy_price,benefit_percent, stop_percent,Bid)
 
-        self.assertEqual(s.sellOrder(), expected)
+        self.assertEqual(s.simpleSellExistCoin(), expected)

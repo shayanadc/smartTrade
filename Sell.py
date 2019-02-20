@@ -6,8 +6,15 @@ class Sell(object):
         self.stop_less = stop_less/100
         self.Bid = Bid
 
-    def sellOrder(self):
+    def simpleSellExistCoin(self):
+        if self.__isPriceCrossUpBenefitLastBid(): return True
+        if self.__isPriceCrossDownStopLessBid(): return True
+        return False
+
+    def __isPriceCrossUpBenefitLastBid(self):
         max_bid = self.Bid[0]
         if max_bid >= (self.buy_price + (self.buy_price * self.benefit_price)): return True
+
+    def __isPriceCrossDownStopLessBid(self):
+        max_bid = self.Bid[0]
         if max_bid < (self.buy_price - (self.buy_price * self.stop_less)): return True
-        return False
