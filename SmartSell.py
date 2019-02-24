@@ -1,21 +1,23 @@
 class SmartSell(object):
 
-    def __init__(self, buy_price, profit_percent, trailing_percent, MaxBid):
+    def __init__(self, buy_price, profit_percent, trailing_percent, crossUpProfitTimes, MaxBid):
         self.buy_price = buy_price
         self.profit_percent = profit_percent / 100
         self.profit_price = self.buy_price * (1 + self.profit_percent)
         self.trailing_percent = trailing_percent / 100
         self.trailing_price = 0
         self.MaxBid = MaxBid
+        self.crossUpProfitTimes = crossUpProfitTimes
 
     def sellBasedOnTrailing(self):
         if self.__isBidCrossUpProfitPrice():
             self.buy_price = self.MaxBid
             self.profit_price = self.buy_price * (1 + self.profit_percent)
-            self.trailing_price = self.__sellConditionPrice(self.buy_price)
+            if(self.crossUpProfitTimes >= 1):
+                self.trailing_price = self.__sellConditionPrice(self.buy_price)
             return 'BidCrossUpProfitPrice'
 
-        if self.__isBidCrossDownSellCondition():
+        if self.__isBidCrossDownSellCondition() and self.crossUpProfitTimes >= 1:
             return 'BidCrossDownSellCondition'
 
         return 'nothing'

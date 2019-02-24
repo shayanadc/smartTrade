@@ -27,10 +27,11 @@ class TestSell(TestCase):
 
     #### change price for smart sell
     conditions = lambda: (
-        ({'buy': 1000, 'profit': 10, 'trailing': 1, 'bid': 1100}, {'result':'BidCrossUpProfitPrice', 'buyPrice' : 1100, 'profitPrice' : 1210, 'trailingPrice': 1089}),
-        ({'buy': 1000, 'profit': 10, 'trailing': 10, 'bid': 890}, {'result':'BidCrossDownSellCondition','buyPrice' : 1000, 'profitPrice' : 1100, 'trailingPrice': 0}),
-        ({'buy': 1000, 'profit': 10, 'trailing': 1, 'bid': 1000}, {'result':'nothing','buyPrice' : 1000, 'profitPrice' : 1100, 'trailingPrice': 0}),
-        ({'buy': 1000, 'profit': 10, 'trailing': 1, 'bid': 990}, {'result':'nothing','buyPrice' : 1000, 'profitPrice' : 1100, 'trailingPrice': 0}),
+        ({'buy': 1000, 'profit': 10, 'trailing': 1, 'bid': 1100, 'crossUpProfitTimes' : 1}, {'result':'BidCrossUpProfitPrice', 'buyPrice' : 1100, 'profitPrice' : 1210, 'trailingPrice': 1089}),
+        ({'buy': 1000, 'profit': 10, 'trailing': 10, 'bid': 890,'crossUpProfitTimes' : 1}, {'result':'BidCrossDownSellCondition','buyPrice' : 1000, 'profitPrice' : 1100, 'trailingPrice': 0}),
+        ({'buy': 1000, 'profit': 10, 'trailing': 10, 'bid': 890,'crossUpProfitTimes' : 0}, {'result':'nothing','buyPrice' : 1000, 'profitPrice' : 1100, 'trailingPrice': 0}),
+        ({'buy': 1000, 'profit': 10, 'trailing': 1, 'bid': 1000,'crossUpProfitTimes' : 1}, {'result':'nothing','buyPrice' : 1000, 'profitPrice' : 1100, 'trailingPrice': 0}),
+        ({'buy': 1000, 'profit': 10, 'trailing': 1, 'bid': 990,'crossUpProfitTimes' : 1}, {'result':'nothing','buyPrice' : 1000, 'profitPrice' : 1100, 'trailingPrice': 0}),
     )
 
     @data_provider(conditions)
@@ -39,18 +40,21 @@ class TestSell(TestCase):
         profit_percent = input['profit']
         trailing_percent = input['trailing']
         Bid = input['bid']
+        crossUpProfitTimes = input['crossUpProfitTimes']
 
-        s = SmartSell.SmartSell(buy_price, profit_percent, trailing_percent, Bid)
+        s = SmartSell.SmartSell(buy_price, profit_percent, trailing_percent, crossUpProfitTimes, Bid)
 
         self.assertEqual(s.sellBasedOnTrailing(), expected['result'])
         self.assertEqual(s.buy_price, expected['buyPrice'])
         self.assertEqual(s.profit_price, expected['profitPrice'])
         self.assertEqual(s.trailing_price, expected['trailingPrice'])
+
     #### test smart sell user case for one Bid
     conditions = lambda: (
-        ({'user':{'name' : 'shayan' , 'buy_price' : 1000, 'profit_percent' : 10, 'trailing_percent' : 1, 'updated_buy_price': 1000}, 'Bid': 1100}, {'buy_price': 1000,'updated_buy_price' : 1100,'result': 'BidCrossUpProfitPrice'}),
-        ({'user':{'name' : 'shayan' , 'buy_price' : 1000, 'profit_percent' : 10, 'trailing_percent' : 1, 'updated_buy_price': 1000}, 'Bid': 1010}, {'buy_price': 1000,'updated_buy_price' : 1000,'result': 'nothing'}),
-        ({'user':{'name' : 'shayan' , 'buy_price' : 1000, 'profit_percent' : 10, 'trailing_percent' : 1, 'updated_buy_price': 1000}, 'Bid': 890}, {'buy_price': 1000,'updated_buy_price' : 1000,'result': 'BidCrossDownSellCondition'}),
+        ({'user':{'name' : 'shayan' , 'buy_price' : 1000, 'profit_percent' : 10, 'trailing_percent' : 1, 'updated_buy_price': 1000,'crossUpProfitTimes' : 0}, 'Bid': 1100}, {'buy_price': 1000,'updated_buy_price' : 1100,'result': 'BidCrossUpProfitPrice','crossUpProfitTimes': 1}),
+        ({'user':{'name' : 'shayan' , 'buy_price' : 1000, 'profit_percent' : 10, 'trailing_percent' : 1, 'updated_buy_price': 1000,'crossUpProfitTimes' : 1}, 'Bid': 1010}, {'buy_price': 1000,'updated_buy_price' : 1000,'result': 'nothing','crossUpProfitTimes': 1}),
+        ({'user':{'name' : 'shayan' , 'buy_price' : 1000, 'profit_percent' : 10, 'trailing_percent' : 1, 'updated_buy_price': 1000,'crossUpProfitTimes' : 1}, 'Bid': 890}, {'buy_price': 1000,'updated_buy_price' : 1000,'result': 'BidCrossDownSellCondition', 'crossUpProfitTimes': 1}),
+        ({'user': {'name': 'shayan', 'buy_price': 1000, 'profit_percent': 10, 'trailing_percent': 1, 'updated_buy_price': 1000, 'crossUpProfitTimes': 0}, 'Bid': 890},{'buy_price': 1000, 'updated_buy_price': 1000, 'result': 'nothing','crossUpProfitTimes': 0}),
     )
 
     @data_provider(conditions)
@@ -63,16 +67,16 @@ class TestSell(TestCase):
         res = p.update()
         self.assertEqual(userObj.updated_buy_price, expected['updated_buy_price'])
         self.assertEqual(userObj.buy_price, expected['buy_price'])
+        self.assertEqual(userObj.crossUpProfitTimes, expected['crossUpProfitTimes'])
         self.assertEqual(res, expected['result'])
 
-    #### test user case for many Bid query
+    # #### test user case for many Bid query
 
     conditions = lambda: (
-        ({'user': {'name':'shayan', 'buy_price' : 1000, 'profit_percent': 20, 'trailing_percent': 2, 'updated_buy_price': 1000},'Bids' : [1000,1100,1200,900]}, {'results': ['nothing', 'nothing', 'BidCrossUpProfitPrice', 'BidCrossDownSellCondition']}),
+        ({'user': {'name':'shayan', 'buy_price' : 1000, 'profit_percent': 20, 'trailing_percent': 2, 'updated_buy_price': 1000,'crossUpProfitTimes' : 0},'Bids' : [1000,1100,1200,900]}, {'results': ['nothing', 'nothing', 'BidCrossUpProfitPrice', 'BidCrossDownSellCondition']}),
     )
     @data_provider(conditions)
     def test_user_process_for_many_bid_query(self,input,expected):
-        print('AAAAA')
         Bids = input['Bids']
         user = input['user']
         userObj = type('', (object,), user)()
