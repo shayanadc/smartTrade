@@ -65,19 +65,22 @@ class TestSell(TestCase):
         self.assertEqual(userObj.buy_price, expected['buy_price'])
         self.assertEqual(res, expected['result'])
 
-
-
     #### test user case for many Bid query
 
-    def test_user_process_for_many_bid_query(self):
-        Bids = [1000,1100,1200,900]
-        results = ['nothing', 'nothing', 'BidCrossUpProfitPrice', 'BidCrossDownSellCondition']
-        user = {'name':'shayan', 'buy_price' : 1000, 'profit_percent': 20, 'trailing_percent': 2, 'updated_buy_price': 1000}
+    conditions = lambda: (
+        ({'user': {'name':'shayan', 'buy_price' : 1000, 'profit_percent': 20, 'trailing_percent': 2, 'updated_buy_price': 1000},'Bids' : [1000,1100,1200,900]}, {'results': ['nothing', 'nothing', 'BidCrossUpProfitPrice', 'BidCrossDownSellCondition']}),
+    )
+    @data_provider(conditions)
+    def test_user_process_for_many_bid_query(self,input,expected):
+        print('AAAAA')
+        Bids = input['Bids']
+        user = input['user']
         userObj = type('', (object,), user)()
+        results = expected['results']
         k = 0
         for i in Bids:
             p = UserProcessorUseCase.UserProcessorUseCase(userObj, i)
             res = p.update()
-            self.assertEqual(results[k],res)
+            self.assertEqual(res,results[k])
             userObj = userObj
             k = k + 1
