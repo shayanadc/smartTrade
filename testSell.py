@@ -1,7 +1,7 @@
 from unittest import TestCase
 import SimpleSell
 import SmartSell
-import UserProcessInterActor
+import UserProcessorUseCase
 
 from unittest_data_provider import data_provider
 
@@ -46,13 +46,38 @@ class TestSell(TestCase):
         self.assertEqual(s.buy_price, expected['buyPrice'])
         self.assertEqual(s.profit_price, expected['profitPrice'])
         self.assertEqual(s.trailing_price, expected['trailingPrice'])
+    #### test smart sell user case for one Bid
+    conditions = lambda: (
+        ({'user':{'name' : 'shayan' , 'buy_price' : 1000, 'profit_percent' : 10, 'trailing_percent' : 1, 'updated_buy_price': 1000}, 'Bid': 1100}, {'buy_price': 1000,'updated_buy_price' : 1100,'result': 'BidCrossUpProfitPrice'}),
+        ({'user':{'name' : 'shayan' , 'buy_price' : 1000, 'profit_percent' : 10, 'trailing_percent' : 1, 'updated_buy_price': 1000}, 'Bid': 1010}, {'buy_price': 1000,'updated_buy_price' : 1000,'result': 'nothing'}),
+        ({'user':{'name' : 'shayan' , 'buy_price' : 1000, 'profit_percent' : 10, 'trailing_percent' : 1, 'updated_buy_price': 1000}, 'Bid': 890}, {'buy_price': 1000,'updated_buy_price' : 1000,'result': 'BidCrossDownSellCondition'}),
+    )
 
-    def test_user_process_for_get_new_buy_price(self):
-        user = {'name' : 'shayan' , 'buy_price' : 1000, 'profit_percent' : 10, 'trailing_percent' : 1, 'updated_buy_price': 1000}
+    @data_provider(conditions)
+    def test_user_process_for_get_new_buy_price(self,input,expected):
+        user = input['user']
         userObj = type('', (object,), user)()
-        Bid = 1100
+        Bid = input['Bid']
 
-        p = UserProcessInterActor.UserProcessInterActor(userObj,Bid)
-        p.update()
-        self.assertEqual(userObj.updated_buy_price, 1100)
-        self.assertEqual(userObj.buy_price, 1000)
+        p = UserProcessorUseCase.UserProcessorUseCase(userObj, Bid)
+        res = p.update()
+        self.assertEqual(userObj.updated_buy_price, expected['updated_buy_price'])
+        self.assertEqual(userObj.buy_price, expected['buy_price'])
+        self.assertEqual(res, expected['result'])
+
+
+
+    #### test user case for many Bid query
+
+    def test_user_process_for_many_bid_query(self):
+        Bids = [1000,1100,1200,900]
+        results = ['nothing', 'nothing', 'BidCrossUpProfitPrice', 'BidCrossDownSellCondition']
+        user = {'name':'shayan', 'buy_price' : 1000, 'profit_percent': 20, 'trailing_percent': 2, 'updated_buy_price': 1000}
+        userObj = type('', (object,), user)()
+        k = 0
+        for i in Bids:
+            p = UserProcessorUseCase.UserProcessorUseCase(userObj, i)
+            res = p.update()
+            self.assertEqual(results[k],res)
+            userObj = userObj
+            k = k + 1
