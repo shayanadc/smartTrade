@@ -51,9 +51,16 @@ class TestSell(TestCase):
         Bid = input['bid']
         crossUpProfitTimes = input['crossUpProfitTimes']
 
-        s = SmartSell.SmartSell(buy_price, profit_percent, stop_less_price, trailing_percent, crossUpProfitTimes, Bid)
+        s = SmartSell.SmartSell()
+        s.BuyPriceSetter(buy_price)
+        s.ProfitPercentSetter(profit_percent)
+        s.TrailingPriceSetter(trailing_percent)
+        s.StopLessPriceSetter(stop_less_price)
+        s.MaxBidSetter(Bid)
+        s.CrossUpTimesSetter(crossUpProfitTimes)
+        r = s.sellBasedOnTrailing()
 
-        self.assertEqual(s.sellBasedOnTrailing(), expected['result'])
+        self.assertEqual(r, expected['result'])
         self.assertEqual(s.buy_price, expected['buyPrice'])
         self.assertEqual(s.profit_price, expected['profitPrice'])
         self.assertEqual(s.stop_less_price, expected['stopLessPrice'])
@@ -85,7 +92,8 @@ class TestSell(TestCase):
         userObj = type('', (object,), user)()
         Bid = input['Bid']
 
-        p = UserProcessorUseCase.UserProcessorUseCase(userObj, Bid)
+        p = UserProcessorUseCase.UserProcessorUseCase(userObj)
+        p.MaxBidSetter(Bid)
         res = p.update()
         self.assertEqual(userObj.updated_buy_price, expected['updated_buy_price'])
         self.assertEqual(userObj.buy_price, expected['buy_price'])
@@ -104,10 +112,12 @@ class TestSell(TestCase):
         (
             {'user': {'name': 'shayan', 'buy_price': 1000, 'profit_percent': 10, 'stop_less_percent': 5,
                       'trailing_percent': 2, 'updated_buy_price': 1000, 'crossUpProfitTimes': 0},
+
              'Bids': [1000, 1010, 1010, 1020, 1030, 1010, 1050, 1100, 1150, 1200, 1100, 1090, 1070]},
             {'results': ['nothing', 'nothing', 'nothing', 'nothing', 'nothing', 'nothing', 'nothing',
                          'BidCrossUpProfitPrice', 'nothing', 'nothing', 'nothing', 'nothing',
-                         'BidCrossDownSellCondition']}),
+                         'BidCrossDownSellCondition'
+                         ]}),
         (
             {'user': {'name': 'shayan', 'buy_price': 1000, 'profit_percent': 10, 'stop_less_percent': 5,
                       'trailing_percent': 2,
@@ -137,7 +147,8 @@ class TestSell(TestCase):
         results = expected['results']
         k = 0
         for i in Bids:
-            p = UserProcessorUseCase.UserProcessorUseCase(userObj, i)
+            p = UserProcessorUseCase.UserProcessorUseCase(userObj)
+            p.MaxBidSetter(i)
             res = p.update()
             self.assertEqual(res, results[k])
             userObj = userObj

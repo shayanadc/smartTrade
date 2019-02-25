@@ -1,6 +1,6 @@
 class SimpleSell(object):
 
-    def __init__(self, buy_price, profit_percent, stop_less, Bid):
+    def __init__(self,buy_price, profit_percent, stop_less, Bid):
         self.buy_price = buy_price
         self.profit_price = profit_percent / 100
         self.stop_less = stop_less / 100
