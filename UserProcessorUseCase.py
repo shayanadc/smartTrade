@@ -10,8 +10,6 @@ class UserProcessorUseCase(object):
         self.MaxBid = MaxBidAmount
 
     def update(self):
-        # smartTrade = SmartSell(self.user.updated_buy_price, self.user.profit_percent, self.stop_less_price,
-        #                        self.user.trailing_percent, self.user.crossUpProfitTimes, self.MaxBid)
         smartTrade = SmartSell()
         smartTrade.MaxBidSetter(self.MaxBid)
         smartTrade.BuyPriceSetter(self.user.updated_buy_price)
