@@ -12,9 +12,9 @@ class SmartSell(object):
 
     def ProfitPercentSetter(self, percentage):
          self.profit_percent = percentage / 100
-         self.profitPrice()
+         self.profitPriceCalc()
 
-    def profitPrice(self):
+    def profitPriceCalc(self):
         self.profit_price = self.buy_price * (1 + self.profit_percent)
     def CrossUpTimesSetter(self, times):
         self.crossUpProfitTimes = times
@@ -28,7 +28,7 @@ class SmartSell(object):
     def sellBasedOnTrailing(self):
         if self.__isBidCrossUpProfitPrice():
             self.buy_price = self.MaxBid
-            self.profitPrice()
+            self.profitPriceCalc()
             self.trailing_price = self.__sellConditionPrice()
             return 'BidCrossUpProfitPrice'
 

@@ -20,5 +20,5 @@ class UserProcessorUseCase(object):
 
         s = smartTrade.sellBasedOnTrailing()
         self.user.updated_buy_price = smartTrade.buy_price
-        if s == 'BidCrossUpProfitPrice': self.user.crossUpProfitTimes = self.user.crossUpProfitTimes + 1
+        if s == 'BidCrossUpProfitPrice': self.user.crossUpProfitTimes += 1
         return s
