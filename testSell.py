@@ -1,6 +1,5 @@
 from unittest import TestCase
-import SimpleSell
-import SmartSell
+import Sell
 import UserProcessorUseCase
 
 from unittest_data_provider import data_provider
@@ -9,21 +8,26 @@ from unittest_data_provider import data_provider
 class TestSell(TestCase):
     #### simple sell exist coin if get profit or loss
     conditions = lambda: (
-        ({'buy': 1000, 'profit': 10, 'stop': 5, 'bid': [1100, 1010, 999, 998]}, 'isPriceCrossUpProfitLastBid'),
-        ({'buy': 1000, 'profit': 10, 'stop': 5, 'bid': [955, 900, 400]}, 'nothing'),
-        ({'buy': 1000, 'profit': 10, 'stop': 5, 'bid': [800, 7000, 600, 500]}, 'isPriceCrossDownStopLessBid'),
+        ({'buy': 1000, 'profit': 10, 'stop': 950, 'bid': 1100}, 'isPriceCrossUpProfitLastBid'),
+        ({'buy': 1000, 'profit': 10, 'stop': 950, 'bid': 955}, 'nothing'),
+        ({'buy': 1000, 'profit': 10, 'stop': 950, 'bid': 800}, 'isPriceCrossDownStopLessBid'),
     )
 
     @data_provider(conditions)
     def test_plan_sell_for_coins_you_already_own_with_market(self, input, expected):
         buy_price = input['buy']
         profit_percent = input['profit']
-        stop_percent = input['stop']
+        stop_price = input['stop']
         Bid = input['bid']
 
-        s = SimpleSell.SimpleSell(buy_price, profit_percent, stop_percent, Bid)
+        s = Sell.Sell()
+        s.BuyPriceSetter(buy_price)
+        s.ProfitPercentSetter(profit_percent)
+        s.StopLessPriceSetter(stop_price)
+        s.MaxBidSetter(Bid)
+        r = s.simpleSell()
 
-        self.assertEqual(s.simpleSellOwnCoin(), expected)
+        self.assertEqual(r, expected)
 
     #### change price for smart sell
     conditions = lambda: (
@@ -51,7 +55,7 @@ class TestSell(TestCase):
         Bid = input['bid']
         crossUpProfitTimes = input['crossUpProfitTimes']
 
-        s = SmartSell.SmartSell()
+        s = Sell.Sell()
         s.BuyPriceSetter(buy_price)
         s.ProfitPercentSetter(profit_percent)
         s.TrailingPriceSetter(trailing_percent)
@@ -94,7 +98,7 @@ class TestSell(TestCase):
 
         p = UserProcessorUseCase.UserProcessorUseCase(userObj)
         p.MaxBidSetter(Bid)
-        res = p.update()
+        res = p.SellBasedOnTrailingForUser()
         self.assertEqual(userObj.updated_buy_price, expected['updated_buy_price'])
         self.assertEqual(userObj.buy_price, expected['buy_price'])
         self.assertEqual(userObj.crossUpProfitTimes, expected['crossUpProfitTimes'])
@@ -149,7 +153,7 @@ class TestSell(TestCase):
         for i in Bids:
             p = UserProcessorUseCase.UserProcessorUseCase(userObj)
             p.MaxBidSetter(i)
-            res = p.update()
+            res = p.SellBasedOnTrailingForUser()
             self.assertEqual(res, results[k])
             userObj = userObj
             k = k + 1

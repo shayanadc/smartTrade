@@ -1,4 +1,4 @@
-class SmartSell(object):
+class Sell(object):
 
     def __init__(self):
         self.trailing_price = 0
@@ -11,16 +11,17 @@ class SmartSell(object):
         self.buy_price = price
 
     def ProfitPercentSetter(self, percentage):
-         self.profit_percent = percentage / 100
-         self.profitPriceCalc()
+        self.profit_percent = percentage / 100
+        self.profitPriceCalc()
 
     def profitPriceCalc(self):
         self.profit_price = self.buy_price * (1 + self.profit_percent)
-    def CrossUpTimesSetter(self, times):
-        self.crossUpProfitTimes = times
 
     def StopLessPriceSetter(self, price):
         self.stop_less_price = price
+
+    def CrossUpTimesSetter(self, times):
+        self.crossUpProfitTimes = times
 
     def TrailingPriceSetter(self, percentage):
         self.trailing_percent = percentage / 100
@@ -38,6 +39,12 @@ class SmartSell(object):
         if self.__isBidCrossDownStopPrice():
             return 'BidCrossDownStopPrice'
 
+        return 'nothing'
+
+    def simpleSell(self):
+
+        if self.__isBidCrossUpProfitPrice(): return 'isPriceCrossUpProfitLastBid'
+        if self.__isBidCrossDownStopPrice(): return 'isPriceCrossDownStopLessBid'
         return 'nothing'
 
     def __isBidCrossDownStopPrice(self):
