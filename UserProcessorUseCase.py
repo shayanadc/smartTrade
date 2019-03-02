@@ -9,6 +9,14 @@ class UserProcessorUseCase(object):
     def MaxBidSetter(self,MaxBidAmount):
         self.MaxBid = MaxBidAmount
 
+    def SimpleSellForUser(self):
+        smartTrade = Sell()
+        smartTrade.MaxBidSetter(self.MaxBid)
+        smartTrade.BuyPriceSetter(self.user.buy_price)
+        smartTrade.ProfitPercentSetter(self.user.profit_percent)
+        smartTrade.StopLessPriceSetter(self.stop_less_price)
+        return smartTrade.simpleSell()
+
     def SellBasedOnTrailingForUser(self):
         smartTrade = Sell()
         smartTrade.MaxBidSetter(self.MaxBid)
@@ -22,11 +30,3 @@ class UserProcessorUseCase(object):
         self.user.updated_buy_price = smartTrade.buy_price
         if s == 'BidCrossUpProfitPrice': self.user.crossUpProfitTimes += 1
         return s
-
-    def SimpleSellForUser(self):
-        smartTrade = Sell()
-        smartTrade.MaxBidSetter(self.MaxBid)
-        smartTrade.BuyPriceSetter(self.user.buy_price)
-        smartTrade.ProfitPercentSetter(self.user.profit_percent)
-        smartTrade.StopLessPriceSetter(self.stop_less_price)
-        return smartTrade.simpleSell()
