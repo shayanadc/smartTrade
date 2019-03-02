@@ -1,6 +1,5 @@
 from Sell import Sell
-
-class UserProcessorUseCase(object):
+class UserSellProcessorUseCase(object):
 
     def __init__(self, user):
         self.user = user
