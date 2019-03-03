@@ -6,7 +6,7 @@ import UserBuyProcessorUseCase
 
 class TestBuy(TestCase):
     conditions = lambda: (
-        ({'buy_price': 1000, 'trailing': 2, 'ask': 999}, {'result' : 'AskCrossUpBuyCondition', 'buy_price' : 999, 'buy_condition' : 1018.98}),
+        ({'buy_price': 1000, 'trailing': 2, 'ask': 999}, {'result' : 'AskCrossDownBuyCondition', 'buy_price' : 999, 'buy_condition' : 1018.98}),
         ({'buy_price': 1000, 'trailing': 2, 'ask': 990, 'buy_condition': 980}, {'result' : 'BuyOrder', 'buy_price' : 1000,'buy_condition' : 980}),
         ({'buy_price': 1000, 'trailing': 2, 'ask': 1100}, {'result' : 'nothing', 'buy_price' : 1000, 'buy_condition': None}),
         ({'buy_price': 1000, 'trailing': 2, 'ask': 1010, 'buy_condition' : 1020}, {'result' : 'nothing', 'buy_price' : 1000, 'buy_condition': 1020}),
@@ -34,9 +34,9 @@ class TestBuy(TestCase):
         self.assertEqual(s.buy_condition, expected['buy_condition'])
 
     conditions = lambda: (
-            ({'user': {'name': 'shayan', 'buy_price': 1000,'updated_buy_price' : 1000,'trailing_percent': 2}, 'Ask': 999},{'buy_price': 1000, 'updated_buy_price': 999, 'result': 'AskCrossUpBuyCondition'}),
-            ({'user': {'name': 'shayan', 'buy_price': 1000,'updated_buy_price' : 1000,'trailing_percent': 2,'buy_condition': 980}, 'Ask': 999},{'buy_price': 1000, 'updated_buy_price': 1000, 'result': 'BuyOrder'}),
-            ({'user': {'name': 'shayan', 'buy_price': 1000,'updated_buy_price' : 1000,'trailing_percent': 2}, 'Ask': 1100},{'buy_price': 1000, 'updated_buy_price': 1000, 'result': 'nothing'}),
+            ({'user': {'name': 'shayan', 'buy_price': 1000,'updated_buy_price' : 1000,'trailing_percent': 2,'buy_condition': None}, 'Ask': 999},{'buy_price': 1000, 'updated_buy_price': 999, 'result': 'AskCrossDownBuyCondition','buy_condition' : 1018.98}),
+            ({'user': {'name': 'shayan', 'buy_price': 1000,'updated_buy_price' : 1000,'trailing_percent': 2,'buy_condition': 980}, 'Ask': 999},{'buy_price': 1000, 'updated_buy_price': 1000, 'result': 'BuyOrder','buy_condition' : 980}),
+            ({'user': {'name': 'shayan', 'buy_price': 1000,'updated_buy_price' : 1000,'trailing_percent': 2,'buy_condition': None}, 'Ask': 1100},{'buy_price': 1000, 'updated_buy_price': 1000, 'result': 'nothing','buy_condition': None}),
         )
 
     @data_provider(conditions)
@@ -51,3 +51,31 @@ class TestBuy(TestCase):
         self.assertEqual(res, expected['result'])
         self.assertEqual(userObj.updated_buy_price, expected['updated_buy_price'])
         self.assertEqual(userObj.buy_price, expected['buy_price'])
+        self.assertEqual(userObj.buy_condition, expected['buy_condition'])
+
+    conditions = lambda: (
+        (
+            {'user': {'name': 'shayan', 'buy_price': 1000, 'trailing_percent': 2, 'updated_buy_price': 1000,'buy_condition' : None},
+             'Asks': [1010,1100,990,1005,950,960,970]},
+            {'results': ['nothing','nothing','AskCrossDownBuyCondition','nothing','AskCrossDownBuyCondition','nothing','BuyOrder']}),
+        (
+            {'user': {'name': 'shayan', 'buy_price': 1000, 'trailing_percent': 2, 'updated_buy_price': 1000,
+                      'buy_condition': None},
+             'Asks': [1010, 1100, 990, 1005, 950, 960, 940,950,960]},
+            {'results': ['nothing', 'nothing', 'AskCrossDownBuyCondition', 'nothing', 'AskCrossDownBuyCondition','nothing', 'AskCrossDownBuyCondition','nothing','BuyOrder']}),
+    )
+
+    @data_provider(conditions)
+    def test_user_process_for_many_ask_query(self, input, expected):
+        Asks = input['Asks']
+        user = input['user']
+        userObj = type('', (object,), user)()
+        results = expected['results']
+        k = 0
+        for i in Asks:
+            p = UserBuyProcessorUseCase.UserBuyProcessorUseCase(userObj)
+            p.MaxAskSetter(i)
+            res = p.BuyBasedOnTrailingForUser()
+            self.assertEqual(res, results[k])
+            userObj = userObj
+            k = k + 1

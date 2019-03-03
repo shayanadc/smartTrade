@@ -24,6 +24,6 @@ class Buy(object):
         if self.MaxAsk <= self.buy_price:
             self.buy_price = self.MaxAsk
             self.CalcBuyCondition()
-            return 'AskCrossUpBuyCondition'
+            return 'AskCrossDownBuyCondition'
 
         return 'nothing'
