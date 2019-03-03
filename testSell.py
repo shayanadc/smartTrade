@@ -1,6 +1,6 @@
 from unittest import TestCase
 import Sell
-import UserProcessorUseCase
+import UserSellProcessorUseCase
 
 from unittest_data_provider import data_provider
 
@@ -96,7 +96,7 @@ class TestSell(TestCase):
         userObj = type('', (object,), user)()
         Bid = input['Bid']
 
-        p = UserProcessorUseCase.UserProcessorUseCase(userObj)
+        p = UserSellProcessorUseCase.UserSellProcessorUseCase(userObj)
         p.MaxBidSetter(Bid)
         res = p.SellBasedOnTrailingForUser()
         self.assertEqual(userObj.updated_buy_price, expected['updated_buy_price'])
@@ -151,7 +151,7 @@ class TestSell(TestCase):
         results = expected['results']
         k = 0
         for i in Bids:
-            p = UserProcessorUseCase.UserProcessorUseCase(userObj)
+            p = UserSellProcessorUseCase.UserSellProcessorUseCase(userObj)
             p.MaxBidSetter(i)
             res = p.SellBasedOnTrailingForUser()
             self.assertEqual(res, results[k])
