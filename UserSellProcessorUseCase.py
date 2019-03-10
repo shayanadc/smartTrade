@@ -1,11 +1,9 @@
 from Sell import Sell
 class UserSellProcessorUseCase(object):
 
-    def __init__(self, user):
+    def __init__(self, user,MaxBidAmount):
         self.user = user
         self.stop_less_price = user.buy_price * (1 - user.stop_less_percent / 100)
-
-    def MaxBidSetter(self,MaxBidAmount):
         self.MaxBid = MaxBidAmount
 
     def SimpleSellForUser(self):

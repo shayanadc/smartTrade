@@ -8,9 +8,9 @@ from unittest_data_provider import data_provider
 class TestSell(TestCase):
     #### simple sell exist coin if get profit or loss
     conditions = lambda: (
-        ({'buy': 1000, 'profit': 10, 'stop': 950, 'bid': 1100}, 'isPriceCrossUpProfitLastBid'),
+        ({'buy': 1000, 'profit': 10, 'stop': 950, 'bid': 1100}, 'sellOrder'),
         ({'buy': 1000, 'profit': 10, 'stop': 950, 'bid': 955}, 'nothing'),
-        ({'buy': 1000, 'profit': 10, 'stop': 950, 'bid': 800}, 'isPriceCrossDownStopLessBid'),
+        ({'buy': 1000, 'profit': 10, 'stop': 950, 'bid': 800}, 'sellOrder'),
     )
 
     @data_provider(conditions)
@@ -82,7 +82,7 @@ class TestSell(TestCase):
           'stop_less_price': 950}),
         ({'user': {'name': 'shayan', 'buy_price': 1000, 'profit_percent': 10, 'stop_less_percent': 5,
                    'trailing_percent': 1, 'updated_buy_price': 1000, 'crossUpProfitTimes': 1}, 'Bid': 890},
-         {'buy_price': 1000, 'updated_buy_price': 1000, 'result': 'BidCrossDownSellCondition', 'crossUpProfitTimes': 1,
+         {'buy_price': 1000, 'updated_buy_price': 1000, 'result': 'sellOrder', 'crossUpProfitTimes': 1,
           'stop_less_price': 950}),
         ({'user': {'name': 'shayan', 'buy_price': 1000, 'profit_percent': 10, 'stop_less_percent': 5,
                    'trailing_percent': 1, 'updated_buy_price': 1000, 'crossUpProfitTimes': 0}, 'Bid': 890},
@@ -96,12 +96,11 @@ class TestSell(TestCase):
         userObj = type('', (object,), user)()
         Bid = input['Bid']
 
-        p = UserSellProcessorUseCase.UserSellProcessorUseCase(userObj)
-        p.MaxBidSetter(Bid)
+        p = UserSellProcessorUseCase.UserSellProcessorUseCase(userObj,Bid)
         res = p.SellBasedOnTrailingForUser()
-        self.assertEqual(userObj.updated_buy_price, expected['updated_buy_price'])
-        self.assertEqual(userObj.buy_price, expected['buy_price'])
-        self.assertEqual(userObj.crossUpProfitTimes, expected['crossUpProfitTimes'])
+        self.assertEqual(p.user.updated_buy_price, expected['updated_buy_price'])
+        self.assertEqual(p.user.buy_price, expected['buy_price'])
+        self.assertEqual(p.user.crossUpProfitTimes, expected['crossUpProfitTimes'])
         self.assertEqual(p.stop_less_price, expected['stop_less_price'])
         self.assertEqual(res, expected['result'])
 
@@ -112,7 +111,7 @@ class TestSell(TestCase):
             {'user': {'name': 'shayan', 'buy_price': 1000, 'profit_percent': 20, 'stop_less_percent': 5,
                       'trailing_percent': 2, 'updated_buy_price': 1000, 'crossUpProfitTimes': 0},
              'Bids': [1000, 1100, 1200, 900]},
-            {'results': ['nothing', 'nothing', 'BidCrossUpProfitPrice', 'BidCrossDownSellCondition']}),
+            {'results': ['nothing', 'nothing', 'BidCrossUpProfitPrice', 'sellOrder']}),
         (
             {'user': {'name': 'shayan', 'buy_price': 1000, 'profit_percent': 10, 'stop_less_percent': 5,
                       'trailing_percent': 2, 'updated_buy_price': 1000, 'crossUpProfitTimes': 0},
@@ -120,8 +119,7 @@ class TestSell(TestCase):
              'Bids': [1000, 1010, 1010, 1020, 1030, 1010, 1050, 1100, 1150, 1200, 1100, 1090, 1070]},
             {'results': ['nothing', 'nothing', 'nothing', 'nothing', 'nothing', 'nothing', 'nothing',
                          'BidCrossUpProfitPrice', 'nothing', 'nothing', 'nothing', 'nothing',
-                         'BidCrossDownSellCondition'
-                         ]}),
+                         'sellOrder']}),
         (
             {'user': {'name': 'shayan', 'buy_price': 1000, 'profit_percent': 10, 'stop_less_percent': 5,
                       'trailing_percent': 2,
@@ -140,7 +138,7 @@ class TestSell(TestCase):
             {'results': ['nothing', 'nothing', 'nothing', 'nothing', 'nothing', 'nothing', 'nothing',
                          'BidCrossUpProfitPrice', 'nothing', 'nothing', 'nothing', 'nothing',
                          'nothing', 'BidCrossUpProfitPrice', 'nothing', 'BidCrossUpProfitPrice',
-                         'BidCrossDownSellCondition']}),
+                         'sellOrder']}),
     )
 
     @data_provider(conditions)
@@ -151,8 +149,7 @@ class TestSell(TestCase):
         results = expected['results']
         k = 0
         for i in Bids:
-            p = UserSellProcessorUseCase.UserSellProcessorUseCase(userObj)
-            p.MaxBidSetter(i)
+            p = UserSellProcessorUseCase.UserSellProcessorUseCase(userObj,i)
             res = p.SellBasedOnTrailingForUser()
             self.assertEqual(res, results[k])
             userObj = userObj
