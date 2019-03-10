@@ -1,10 +1,10 @@
 from Buy import Buy
 class UserBuyProcessorUseCase(object):
 
-    def __init__(self, user):
+    def __init__(self, user,MaxAskAmount):
         self.user = user
-    def MaxAskSetter(self, MaxAskAmount):
         self.MaxAsk = MaxAskAmount
+
 
     def BuyBasedOnTrailingForUser(self):
         smartTrade = Buy(self.user.buy_condition)

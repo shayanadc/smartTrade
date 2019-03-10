@@ -45,13 +45,12 @@ class TestBuy(TestCase):
         userObj = type('', (object,), user)()
         Ask = input['Ask']
 
-        p = UserBuyProcessorUseCase.UserBuyProcessorUseCase(userObj)
-        p.MaxAskSetter(Ask)
+        p = UserBuyProcessorUseCase.UserBuyProcessorUseCase(userObj,Ask)
         res = p.BuyBasedOnTrailingForUser()
         self.assertEqual(res, expected['result'])
-        self.assertEqual(userObj.updated_buy_price, expected['updated_buy_price'])
-        self.assertEqual(userObj.buy_price, expected['buy_price'])
-        self.assertEqual(userObj.buy_condition, expected['buy_condition'])
+        self.assertEqual(p.user.updated_buy_price, expected['updated_buy_price'])
+        self.assertEqual(p.user.buy_price, expected['buy_price'])
+        self.assertEqual(p.user.buy_condition, expected['buy_condition'])
 
     conditions = lambda: (
         (
@@ -73,8 +72,7 @@ class TestBuy(TestCase):
         results = expected['results']
         k = 0
         for i in Asks:
-            p = UserBuyProcessorUseCase.UserBuyProcessorUseCase(userObj)
-            p.MaxAskSetter(i)
+            p = UserBuyProcessorUseCase.UserBuyProcessorUseCase(userObj,i)
             res = p.BuyBasedOnTrailingForUser()
             self.assertEqual(res, results[k])
             userObj = userObj

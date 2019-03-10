@@ -34,7 +34,7 @@ class Sell(object):
             return 'BidCrossUpProfitPrice'
 
         if self.__isBidCrossDownSellCondition() and self.crossUpProfitTimes >= 1:
-            return 'BidCrossDownSellCondition'
+            return 'sellOrder'
 
         if self.__isBidCrossDownStopPrice():
             return 'BidCrossDownStopPrice'
@@ -42,9 +42,8 @@ class Sell(object):
         return 'nothing'
 
     def simpleSell(self):
-
-        if self.__isBidCrossUpProfitPrice(): return 'isPriceCrossUpProfitLastBid'
-        if self.__isBidCrossDownStopPrice(): return 'isPriceCrossDownStopLessBid'
+        if self.__isBidCrossUpProfitPrice(): return 'sellOrder'
+        if self.__isBidCrossDownStopPrice(): return 'sellOrder'
         return 'nothing'
 
     def __isBidCrossDownStopPrice(self):
