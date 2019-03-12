@@ -1,9 +1,9 @@
 import pymongo
-
+import setting
 class MongoDB(object):
 
     def __init__(self,Pair):
-        self.myClient = pymongo.MongoClient("mongodb://localhost:27017/")
+        self.myClient = pymongo.MongoClient(setting.MONGOHOST)
         self.db = self.myClient["spot_user_preferences"]
         self.myCol = self.db[Pair]
 

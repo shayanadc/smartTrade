@@ -1,9 +1,17 @@
 import pika
-
-connection = pika.BlockingConnection(
+import setting
+import time
+try:
+    connection = pika.BlockingConnection(
             pika.ConnectionParameters(
-                host='172.19.60.27', port=5672,
-                credentials=pika.PlainCredentials(username='shayan', password='1234')))
+                host=setting.RABBITHOST, port=setting.RABBITPORT,
+                credentials=pika.PlainCredentials(username=setting.RABBITUSERNAME, password=setting.RABBITPASS)))
+except Exception as e:
+    time.sleep(60)
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(
+            host=setting.RABBITHOST, port=setting.RABBITPORT,
+            credentials=pika.PlainCredentials(username=setting.RABBITUSERNAME, password=setting.RABBITPASS)))
 
 channel = connection.channel()
 
