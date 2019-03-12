@@ -13,6 +13,7 @@ services:
 
   bids:
     image: fsalehpour/bids:latest
+    restart: on-failure
     networks:
       - smartnet
     environment:
@@ -21,6 +22,7 @@ services:
       - rabbitmq
 
   smart:
+    restart: on-failure
     build: .
     networks:
       - smartnet
