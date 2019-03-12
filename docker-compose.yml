@@ -9,8 +9,6 @@ services:
     image: rabbitmq:management-alpine
     networks:
       - smartnet
-    ports:
-      - "8080:15672"
     hostname: "smartmq"
 
   bids:
