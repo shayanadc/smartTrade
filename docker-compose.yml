@@ -1,0 +1,34 @@
+version: "3"
+services:
+  mongo:
+    image: mongo
+    networks:
+      - smartnet
+
+  rabbitmq:
+    image: rabbitmq:management-alpine
+    networks:
+      - smartnet
+    ports:
+      - "8080:15672"
+    hostname: "smartmq"
+
+  bids:
+    image: fsalehpour/bids:latest
+    networks:
+      - smartnet
+    environment:
+      - RMQ_HOST=rabbitmq
+    depends_on:
+      - rabbitmq
+
+  smart:
+    build: .
+    networks:
+      - smartnet
+    depends_on:
+      - rabbitmq
+      - mongo
+
+networks:
+  smartnet:
