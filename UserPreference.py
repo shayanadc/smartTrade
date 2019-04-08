@@ -9,13 +9,24 @@ class UserPreference(object):
         dict = {'name': name, 'tradeType' : tradeType, 'buy_price' :BuyPrice, 'profit_percent' : Profit, 'stop_less_percent' : StopLess, 'trailing_percent': Trailing, 'crossUpProfitTimes' : CrossUpProfitTimes, 'buy_condition': BuyCondition, 'updated_buy_price' : UpdatedBuyPrice}
         self.storage.insert(dict)
 
-    def allUserForPair(self):
+    def allUserForBuyPair(self):
         userDict  = self.storage.findAll()
         New = []
         for i in userDict:
-            i.pop("_id")
-            userObj = type('', (object,), i)()
-            New.append(userObj)
+            if i['tradeType'] == 'smartBuy':
+                i.pop("_id")
+                userObj = type('', (object,), i)()
+                New.append(userObj)
+        return New
+
+    def allUserForSellPair(self):
+        userDict  = self.storage.findAll()
+        New = []
+        for i in userDict:
+            if i['tradeType'] == 'smartSell':
+                i.pop("_id")
+                userObj = type('', (object,), i)()
+                New.append(userObj)
         return New
 
     def deleteUser(self,user):
