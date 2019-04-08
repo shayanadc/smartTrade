@@ -9,7 +9,7 @@ class UserRouting(object):
 
     def runAsk(self,Ask,Pair):
         u = UserPreference.UserPreference(Pair)
-        users = u.allUserForPair()
+        users = u.allUserForBuyPair()
         result = None
         for user in users:
             s = UserBuyProcessorUseCase.UserBuyProcessorUseCase(user, Ask)
@@ -41,7 +41,7 @@ class UserRouting(object):
 
     def runBid(self,BID,Pair):
         u = UserPreference.UserPreference(Pair)
-        users = u.allUserForPair()
+        users = u.allUserForSellPair()
         result = None
         for user in users:
             s = UserSellProcessorUseCase.UserSellProcessorUseCase(user,BID)
