@@ -19,12 +19,12 @@ class UserRouting(object):
             import csv
             import os.path
 
-            file_exists = os.path.isfile('trade.csv')
 
             toCSV = [{'name': user.name, 'buy_price': s.user.buy_price,
                       'updated_buy_price': s.user.updated_buy_price,
                       'Ask': Ask, 'Pair': Pair, 'result': result}]
             fileaddr = setting.REPORT_ADDR + 'trade_buy.csv'
+            file_exists = os.path.isfile(fileaddr)
             with open(fileaddr, 'a', encoding='utf8', newline='') as output_file:
                 fc = csv.DictWriter(output_file,
                                     fieldnames=toCSV[0].keys(),
@@ -53,11 +53,12 @@ class UserRouting(object):
             import csv
             import os.path
 
-            file_exists = os.path.isfile('trade.csv')
 
             toCSV = [{'name': user.name,'buy_price': s.user.buy_price, 'updated_buy_price' : s.user.updated_buy_price, 'Bid': BID, 'Pair': Pair, 'result': result}]
 
             fileaddr = setting.REPORT_ADDR + 'trade_sell.csv'
+            file_exists = os.path.isfile(fileaddr)
+
             with open(fileaddr, 'a', encoding='utf8', newline='') as output_file:
                 fc = csv.DictWriter(output_file,
                                     fieldnames=toCSV[0].keys(),
