@@ -29,11 +29,15 @@ class UserPreference(object):
                 New.append(userObj)
         return New
 
+    def changeUserType(self,user,price):
+        self.storage.update({'name': user.name}, {'tradeType': 'smartSell'})
+        self.storage.update({'name': user.name}, {'buy_price': price})
+
     def deleteUser(self,user):
         q = {'name' : user.name}
         return self.storage.delete(q)
 
     def updateUser(self, user):
         if hasattr(user, 'crossUpProfitTimes'): self.storage.update({'name' : user.name}, {'crossUpProfitTimes' : user.crossUpProfitTimes})
-        if hasattr(user, 'buy_condition'): self.storage.update({'user': user.name}, {'buy_condition' : user.buy_condition})
+        if hasattr(user, 'buy_condition'): self.storage.update({'name': user.name}, {'buy_condition' : user.buy_condition})
         if hasattr(user, 'updated_buy_price'): self.storage.update({'name': user.name}, {'updated_buy_price' : user.updated_buy_price})
