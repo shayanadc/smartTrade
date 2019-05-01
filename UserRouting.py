@@ -10,6 +10,7 @@ class UserRouting(object):
     def runAsk(self,Ask,Pair):
         u = UserPreference.UserPreference(Pair)
         users = u.allUserForBuyPair()
+
         result = None
         for user in users:
             s = UserBuyProcessorUseCase.UserBuyProcessorUseCase(user, Ask)
@@ -34,7 +35,7 @@ class UserRouting(object):
                 fc.writerows(toCSV)
 
             if result == 'BuyOrder':
-                u.deleteUser(s.user)
+                u.changeUserType(s.user,Ask)
 
             if result == 'AskCrossDownBuyCondition':
                 u.updateUser(s.user)
