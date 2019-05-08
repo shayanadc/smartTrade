@@ -32,6 +32,7 @@ class UserPreference(object):
     def changeUserType(self,user,price):
         self.storage.update({'name': user.name}, {'tradeType': 'smartSell'})
         self.storage.update({'name': user.name}, {'buy_price': price})
+        self.storage.update({'name': user.name}, {'updated_buy_price': price})
 
     def deleteUser(self,user):
         q = {'name' : user.name}
